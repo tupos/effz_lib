@@ -17,23 +17,16 @@ limitations under the License.
 #include <Python.h>
 #include <config.h>
 
-#include "effz_main_loop_functions.h"
 #include "effz_config.h"
 
 #include <cstdlib>
 #include <csignal>
+#include <iostream>
 
 using namespace eff_z;
 
 
-void effz_sigint(int signal){
-	std::cout << "exited with ctrl-c: " << signal << "\n";
-	std::_Exit(EXIT_FAILURE);
-}
-
 int main(int argc, char *argv[]) try {
-
-	std::signal(SIGINT,effz_sigint);
 
 	config::shared_config().check_dirs();
 
@@ -47,19 +40,8 @@ int main(int argc, char *argv[]) try {
 	PyRun_SimpleString("print(sys.path)");
 #endif
 
-	char user_input;
-	base_menu_ptr current_menu = std::make_shared<main_menu>();
-	while(!current_menu->is_quit_selected()){
-		if(current_menu->is_show_menu()){
-			current_menu->print_menu();
-		}
-		std::cin >> user_input;
-		base_menu_ptr new_menu
-			= current_menu->get_next_menu(user_input);
-		if(new_menu){
-			current_menu.swap(new_menu);
-		}
-	}
+	std::cout << "Hello world\n";
+
 #ifdef EFFZ_PYTHON_VERSION_SIX
 	if(Py_FinalizeEx() < 0){
 		return 120;
