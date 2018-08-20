@@ -1,12 +1,5 @@
 
-#lib_LIBRARIES = libeffzlib.a
 lib_LTLIBRARIES = libeffzlib.la
-
-#libeffzlib_a_SOURCES = effz_atomic_data.cpp effz_config.cpp\
-			   #effz_exceptions.cpp effz_python_utility.cpp\
-			   #effz_spec_func.cpp effz_utility.cpp\
-			   #effz_zeroth_order.cpp effz_zeroth_order_python.cpp\
-			   #main.cpp
 
 libeffzlib_la_SOURCES = effz_atomic_data.cpp effz_config.cpp\
 			   effz_exceptions.cpp effz_python_utility.cpp\
@@ -22,23 +15,15 @@ pkginclude_HEADERS = effz_atomic_data.h effz_config.h\
 								  effz_zeroth_order.h\
 								  effz_zeroth_order_python.h
 
-
-#libeffzlib_a_CPPFLAGS = -I$(top_srcdir)/src @PYTHONINCLUDE@\
-				#@GSLCPPFLAGS@ @TBBCPPFLAGS@\
-				#-DEFFZ_PYTHON_SRC_DIR='"$(effzpythondir)"'
-
 libeffzlib_la_CPPFLAGS = -I$(top_srcdir)/src @PYTHONINCLUDE@\
 				@GSLCPPFLAGS@ @TBBCPPFLAGS@\
 				-DEFFZ_PYTHON_SRC_DIR='"$(effzpythondir)"'
 
-#libeffzlib_a_LDFLAGS = @PYTHONLDFLAGS@ @GSLLDFLAGS@ @TBBLDFLAGS@
-
 libeffzlib_la_LDFLAGS = -version-info 1:1:1
-
-#libeffzlib_a_LIBADD = @PYTHONLIBS@
 
 effzpythondir=$(pkgdatadir)/python_src_dir
 dist_effzpython_DATA = effz_zeroth_order_symbolic.py
+
 uninstall-hook:
 	rm -rf $(pkgdatadir)
 

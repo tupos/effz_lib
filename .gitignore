@@ -4,6 +4,7 @@
 .DS_Store
 ._.DS_Store
 *.swp
+*.lo
 /**.txt*/
 .ipynb_checkpoints
 Makefile
@@ -25,3 +26,16 @@ src/effz
 stamp-h1
 effz
 *.tar.gz
+ar-lib
+compile
+config.guess
+config.sub
+libtool
+ltmain.sh
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+src/.libs/
+src/libeffzlib.la
