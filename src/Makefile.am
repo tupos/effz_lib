@@ -15,7 +15,8 @@ pkginclude_HEADERS = effz_atomic_data.h effz_config.h\
 					 effz_zeroth_order.h\
 					 effz_zeroth_order_python.h
 
-libeffzlib_la_CPPFLAGS = -I$(top_srcdir)/src @PYTHONINCLUDE@\
+libeffzlib_la_CPPFLAGS = -I$(top_srcdir)/src\
+						 -I$(top_srcdir)/effz_lib @PYTHONINCLUDE@\
 						 @GSLCPPFLAGS@ @TBBCPPFLAGS@\
 						 -DEFFZ_PYTHON_SRC_DIR='"$(effzpythondir)"'
 

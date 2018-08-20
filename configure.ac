@@ -8,6 +8,7 @@ AC_CONFIG_SRCDIR([src/effz_zeroth_order.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([
 				 Makefile
+				 effz_lib/Makefile
 				 src/Makefile
 				 ])
 
@@ -18,7 +19,10 @@ AC_PROG_CXXCPP
 m4_include([m4/m4_ax_cxx_compile_stdcxx.m4])
 AX_CXX_COMPILE_STDCXX(14)
 
-dnl check ranlib and ar
+dnl check for symbolic links
+AC_PROG_LN_S
+
+dnl check libtool and ar
 AM_PROG_AR()
 LT_INIT
 
