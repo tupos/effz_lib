@@ -16,7 +16,7 @@ limitations under the License.
 
 #include "effz_atomic_data.h"
 
-namespace eff_z {
+namespace effz {
 
 	namespace atomic_data {
 
@@ -1741,6 +1741,6 @@ namespace eff_z {
 				{"Db",105},{"Sg",106},{"Bh",107},{"Hs",108}
 			};
 
-	} /*end namespace eff_z*/
-} /*end namespace eff_z*/
+	} /*end namespace atomic_data*/
+} /*end namespace effz*/
 

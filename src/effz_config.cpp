@@ -24,7 +24,7 @@ limitations under the License.
 #include <sys/types.h>
 #include <sys/stat.h>
 
-namespace eff_z{
+namespace effz{
 
 	enum class dir_prop {blk, chr, dir, fifo, reg, lnk, not_exist};
 	class file_sys{
@@ -208,4 +208,4 @@ namespace eff_z{
 	{
 		return python_path_cmd;
 	}
-} /* end namespace eff_z */
+} /* end namespace effz */

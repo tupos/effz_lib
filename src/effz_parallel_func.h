@@ -19,7 +19,7 @@ limitations under the License.
 
 #include <tbb/tbb.h>
 
-namespace eff_z{
+namespace effz{
 
 	namespace parallel{
 
@@ -126,6 +126,6 @@ namespace eff_z{
 
 	} /* end namespace parallel */
 
-} /* end namespace eff_z */
+} /* end namespace effz */
 
 #endif /* EFFZ_PARALLEL_FUNC_H */

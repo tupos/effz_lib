@@ -19,7 +19,7 @@ limitations under the License.
 #include <locale>
 #include <codecvt>
 
-namespace eff_z{
+namespace effz{
 
 	void print_occ_nums(std::ostream &stream, const occ_nums_array &g){
 		stream << "{\n";
@@ -119,4 +119,4 @@ namespace eff_z{
 
 		return 0;
 	}
-} /* end namespace eff_z */
+} /* end namespace effz */

@@ -28,7 +28,7 @@ limitations under the License.
 #include <functional>
 
 
-namespace eff_z{
+namespace effz{
 	namespace zeroth_order{
 
 		PyObject* computed_rho_h_l(const occ_nums_array &g);
@@ -65,6 +65,6 @@ namespace eff_z{
 		};
 
 	} /* end namespace zeroth_order */
-} /* end namespace eff_z */
+} /* end namespace effz */
 
 #endif /* EFFZ_ZEROTH_ORDER_PYTHON_H */

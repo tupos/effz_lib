@@ -32,7 +32,7 @@ limitations under the License.
 #include <tuple>
 #include <algorithm>
 
-namespace eff_z{
+namespace effz{
 	namespace zeroth_order{
 
 		double three_j_prod_direct(
@@ -43,13 +43,13 @@ namespace eff_z{
 				const int k)
 		{
 			const double three_j_1 =
-				eff_z::three_j_symbol({{{l,l,k},{0,0,0}}});
+				effz::three_j_symbol({{{l,l,k},{0,0,0}}});
 			const double three_j_2 =
-				eff_z::three_j_symbol({{{l,l,k},{m,-m,0}}});
+				effz::three_j_symbol({{{l,l,k},{m,-m,0}}});
 			const double three_j_3 =
-				eff_z::three_j_symbol({{{l1,l1,k},{0,0,0}}});
+				effz::three_j_symbol({{{l1,l1,k},{0,0,0}}});
 			const double three_j_4 =
-				eff_z::three_j_symbol({{{l1,l1,k},{m1,-m1,0}}});
+				effz::three_j_symbol({{{l1,l1,k},{m1,-m1,0}}});
 			int prefactor = ((m+m1)%2 == 0) ? 1 : -1;
 			prefactor *= (2 * l + 1) * (2 * l1 + 1);
 
@@ -68,10 +68,10 @@ namespace eff_z{
 			auto inner_0_r =
 				[n1,l1,k](double r) -> double {
 					return 1. / std::pow(r, static_cast<double>(k) + 1)
-						* eff_z::integration::quad(
+						* effz::integration::quad(
 								[n1,l1,k](double r1) -> double {
 								double h_rnl =
-								std::abs(eff_z::h_rnl(n1,l1,r1));
+								std::abs(effz::h_rnl(n1,l1,r1));
 								return h_rnl * h_rnl
 								* std::pow(r1,static_cast<double>(k) + 2);
 								}, {0.,r});
@@ -80,10 +80,10 @@ namespace eff_z{
 			auto inner_r_inf =
 				[n1,l1,k](double r) -> double {
 					return std::pow(r, static_cast<double>(k))
-						* eff_z::integration::int_r_inf(
+						* effz::integration::int_r_inf(
 								[n1,l1,k](double r1) -> double {
 								double h_rnl =
-								std::abs(eff_z::h_rnl(n1,l1,r1));
+								std::abs(effz::h_rnl(n1,l1,r1));
 								return h_rnl * h_rnl
 								* std::pow(r1,2-(static_cast<double>(k)+1));
 								}, r);
@@ -91,12 +91,12 @@ namespace eff_z{
 
 			auto integral = [n,l,&inner_0_r,&inner_r_inf](double r)
 				-> double {
-					double h_rnl = eff_z::h_rnl(n,l,r);
+					double h_rnl = effz::h_rnl(n,l,r);
 					return r * r * h_rnl * h_rnl
 						* (inner_0_r(r) + inner_r_inf(r));
 				};
 
-			return eff_z::integration::int_0_inf(integral);
+			return effz::integration::int_0_inf(integral);
 		}
 
 
@@ -160,7 +160,7 @@ namespace eff_z{
 							);
 				};
 
-			database = eff_z::parallel::parallel_table(
+			database = effz::parallel::parallel_table(
 					direct_quantum_nums, f_to_map);
 		}
 
@@ -241,16 +241,16 @@ namespace eff_z{
 		{
 			const int q = m1 - m;
 			const bool is_q_between =
-				eff_z::in_range<int>(-k,k,q);
+				effz::in_range<int>(-k,k,q);
 			if(!is_q_between){
 				return 0.;
 			}
 			int prefactor = ((l + l1 + k)%2 == 0) ? 1 : -1;
 			prefactor *= (2 * l + 1) * (2 * l1 + 1);
 			const double three_j_1 =
-				eff_z::three_j_symbol({{{l1,l,k},{0,0,0}}});
+				effz::three_j_symbol({{{l1,l,k},{0,0,0}}});
 			const double three_j_2 =
-				eff_z::three_j_symbol({{{l1,l,k},{-m1,m,q}}});
+				effz::three_j_symbol({{{l1,l,k},{-m1,m,q}}});
 
 			return static_cast<double>(prefactor)
 				* three_j_1 * three_j_2 * three_j_1 * three_j_2;
@@ -267,12 +267,12 @@ namespace eff_z{
 			auto inner_0_r =
 				[n,l,n1,l1,k](double r) -> double {
 					return 1. / std::pow(r, static_cast<double>(k) + 1)
-						* eff_z::integration::quad(
+						* effz::integration::quad(
 								[n,l,n1,l1,k](double r1) -> double {
 								double h_rnl =
-								eff_z::h_rnl(n,l,r1);
+								effz::h_rnl(n,l,r1);
 								double h_rnl1 =
-								eff_z::h_rnl(n1,l1,r1);
+								effz::h_rnl(n1,l1,r1);
 								return h_rnl * h_rnl1
 								* std::pow(r1,static_cast<double>(k) + 2);
 								},
@@ -282,12 +282,12 @@ namespace eff_z{
 			auto inner_r_inf =
 				[n,l,n1,l1,k](double r) -> double {
 					return std::pow(r, static_cast<double>(k))
-						* eff_z::integration::int_r_inf(
+						* effz::integration::int_r_inf(
 								[n,l,n1,l1,k](double r1) -> double {
 								double h_rnl =
-								eff_z::h_rnl(n,l,r1);
+								effz::h_rnl(n,l,r1);
 								double h_rnl1 =
-								eff_z::h_rnl(n1,l1,r1);
+								effz::h_rnl(n1,l1,r1);
 								return h_rnl * h_rnl1
 								* std::pow(r1,2-(static_cast<double>(k)+1));
 								}, r);
@@ -295,13 +295,13 @@ namespace eff_z{
 
 			auto integral =	[n,l,n1,l1,&inner_0_r,&inner_r_inf](double r)
 				-> double {
-					double h_rnl = eff_z::h_rnl(n,l,r);
-					double h_rnl1 = eff_z::h_rnl(n1,l1,r);
+					double h_rnl = effz::h_rnl(n,l,r);
+					double h_rnl1 = effz::h_rnl(n1,l1,r);
 					return r * r * h_rnl1 * h_rnl
 						* (inner_0_r(r) + inner_r_inf(r));
 				};
 
-			return eff_z::integration::int_0_inf(integral);
+			return effz::integration::int_0_inf(integral);
 		}
 
 		void i_exchange_database::calculate_database(){
@@ -364,7 +364,7 @@ namespace eff_z{
 							);
 				};
 
-			database = eff_z::parallel::parallel_table(
+			database = effz::parallel::parallel_table(
 					exchange_quantum_nums, f_to_map);
 		}
 
@@ -519,7 +519,7 @@ namespace eff_z{
 				return v_direct(g_i[0], g_i[1], g_i[2], g_i[3],
 						g_i[4], g_i[5]);
 			};
-			sum = eff_z::parallel::parallel_sum<double>(
+			sum = effz::parallel::parallel_sum<double>(
 					occ_nums_array, lambda);
 
 			return sum;
@@ -542,7 +542,7 @@ namespace eff_z{
 					v_exchange(g_i[0], g_i[1], g_i[2], g_i[4],
 							g_i[5], g_i[6]);
 			};
-			sum = eff_z::parallel::parallel_sum<double>(
+			sum = effz::parallel::parallel_sum<double>(
 					occ_nums_array, lambda);
 
 			return sum;
@@ -601,9 +601,9 @@ namespace eff_z{
 				const double phi) const {
 			double sum = 0.;
 			for(const auto &g_i: occ_nums){
-				double h_rnl = eff_z::h_l_rnl(z,g_i[0],g_i[1], r);
+				double h_rnl = effz::h_l_rnl(z,g_i[0],g_i[1], r);
 				double abs_y_lm =
-					std::abs(eff_z::sph_harm_y(
+					std::abs(effz::sph_harm_y(
 								g_i[1], g_i[2], theta, phi));
 				sum += h_rnl * h_rnl * abs_y_lm * abs_y_lm;
 			}
@@ -612,4 +612,4 @@ namespace eff_z{
 
 	} /* end namespace zeroth_order */
 
-} /* end namespace eff_z */
+} /* end namespace effz */

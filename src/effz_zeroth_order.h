@@ -25,7 +25,7 @@ limitations under the License.
 #include <vector>
 #include <string>
 
-namespace eff_z{
+namespace effz{
 	namespace zeroth_order{
 		double three_j_prod_direct(
 				const int l,
@@ -177,6 +177,6 @@ namespace eff_z{
 		};
 	} /*end namespace zeroth_order*/
 
-} /*end namespace eff_z*/
+} /*end namespace effz*/
 
 #endif /* EFFZ_ZEROTH_ORDER_H */

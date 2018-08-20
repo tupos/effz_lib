@@ -29,7 +29,7 @@ limitations under the License.
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_math.h>
 
-namespace eff_z{
+namespace effz{
 	template <typename T>
 		bool in_range(T begin, T end, T num){
 			std::vector<T> range(std::abs(end - begin) + 1);
@@ -77,6 +77,6 @@ namespace eff_z{
 		}
 
 
-} /* end namespace eff_z */
+} /* end namespace effz */
 
 #endif /* EFFZ_UTILITY_H */

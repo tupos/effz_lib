@@ -27,7 +27,7 @@ limitations under the License.
 #include <iostream>
 #include <string>
 
-namespace eff_z{
+namespace effz{
 
 	void print_PyObject(PyObject *obj);
 	template<typename T, typename... Args>
@@ -112,6 +112,6 @@ namespace eff_z{
 			return symbol_instance;
 
 		}
-} /* end namespace eff_z */
+} /* end namespace effz */
 
 #endif /* EFFZ_PYTHON_UTILITY_H */

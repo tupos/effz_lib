@@ -30,7 +30,7 @@ limitations under the License.
 
 
 
-namespace eff_z {
+namespace effz {
 
 	double h_rnl(const int n, const int l, const double r){
 		return gsl_sf_hydrogenicR(n, l, 1., r);
@@ -143,4 +143,4 @@ namespace eff_z {
 		return e * gsl_sf_legendre_sphPlm(ll,mm,x)
 			* static_cast<double>(prefactor);
 	}
-} /* end namespace eff_z*/
+} /* end namespace effz*/

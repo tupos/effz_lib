@@ -20,10 +20,10 @@ limitations under the License.
 #include <vector>
 #include <array>
 
-namespace eff_z{
+namespace effz{
 
 	typedef std::vector<std::array<int,4>> occ_nums_array;
 
-} /* end namespace eff_z */
+} /* end namespace effz */
 
 #endif /* EFFZ_TYPEDEFS_H */

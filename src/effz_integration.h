@@ -25,7 +25,7 @@ limitations under the License.
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_integration.h>
 
-namespace eff_z{
+namespace effz{
 
 	namespace integration{
 
@@ -124,14 +124,14 @@ namespace eff_z{
 					const int max_num_iter = 10)
 			{
 				double res_0_cutoff =
-					eff_z::integration::quad(f, {0.,r_cutoff});
+					effz::integration::quad(f, {0.,r_cutoff});
 				double residue = 0.;
 				double r_cutoff_old = r_cutoff;
 				double r_cutoff_new = r_cutoff + r_cutoff_increase;
 				int num_iter = 0;
 				do{
 					residue =
-						eff_z::integration::
+						effz::integration::
 						quad(f, {r_cutoff_old,r_cutoff_new});
 					res_0_cutoff += residue;
 					r_cutoff_increase *= 2.;
@@ -153,14 +153,14 @@ namespace eff_z{
 					const int max_num_iter = 10)
 			{
 				double res_r_cutoff =
-					eff_z::integration::quad(f, {r,r_cutoff});
+					effz::integration::quad(f, {r,r_cutoff});
 				double residue = 0.;
 				double r_cutoff_old = r_cutoff;
 				double r_cutoff_new = r_cutoff + r_cutoff_increase;
 				int num_iter = 0;
 				do{
 					residue =
-						eff_z::integration::
+						effz::integration::
 						quad(f, {r_cutoff_old,r_cutoff_new});
 					res_r_cutoff += residue;
 					r_cutoff_increase *= 2.;
@@ -174,7 +174,7 @@ namespace eff_z{
 			}
 
 	} /*namespace integration*/
-} /*namespace eff_z*/
+} /*namespace effz*/
 
 
 #endif /* EFFZ_INTEGRATION_H */

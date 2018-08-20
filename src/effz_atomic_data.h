@@ -24,7 +24,7 @@ limitations under the License.
 #include <unordered_map>
 #include <string>
 
-namespace eff_z {
+namespace effz {
 
 	namespace atomic_data {
 
@@ -48,8 +48,8 @@ namespace eff_z {
 		};
 
 
-	} /*end namespace eff_z*/
-} /*end namespace eff_z*/
+	} /*end namespace atomic_data*/
+} /*end namespace effz*/
 
 
 #endif /* EFFZ_ATOMIC_DATA_H */

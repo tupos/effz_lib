@@ -21,7 +21,7 @@ limitations under the License.
 
 #include <string>
 
-namespace eff_z{
+namespace effz{
 
 
 	class config{
@@ -51,6 +51,6 @@ namespace eff_z{
 				get_checked_dir(const std::string &dir_name) const;
 	};
 
-} /* end namespace eff_z */
+} /* end namespace effz */
 
 #endif /* EFFZ_CONFIG_H */

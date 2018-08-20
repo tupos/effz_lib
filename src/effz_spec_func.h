@@ -22,7 +22,7 @@ limitations under the License.
 #include <array>
 
 
-namespace eff_z {
+namespace effz {
 	/*
 	 *abbreviations
 	 *    h_*** --- hydrogen_***, i.e. charge = 1
@@ -108,6 +108,6 @@ namespace eff_z {
 			);
 
 
-} /*end namespace eff_z*/
+} /*end namespace effz*/
 
 #endif /* EFFZ_SPEC_FUNC_H */

@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <iostream>
 
-namespace eff_z{
+namespace effz{
 
 	void print_PyObject(PyObject *obj){
 		PyObject *builtins, *print, *arg, *result;
@@ -291,4 +291,4 @@ error:
 			return symbol_instance;
 		}
 
-} /* end namespace eff_z */
+} /* end namespace effz */

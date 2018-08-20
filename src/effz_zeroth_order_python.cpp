@@ -23,7 +23,7 @@ limitations under the License.
 #include <functional>
 
 
-namespace eff_z{
+namespace effz{
 	namespace zeroth_order{
 		namespace{
 			PyObject* get_effz_py_module();
@@ -356,11 +356,11 @@ namespace eff_z{
 					sympy_Object_to_string(density_ptr.get(),"pretty")) { }
 
 		std::string symbolic_density::get_density_latex_str(){
-			return eff_z::wstr_to_str(density_latex_str);
+			return effz::wstr_to_str(density_latex_str);
 		}
 
 		std::string symbolic_density::get_density_pretty_str(){
-			return eff_z::wstr_to_str(density_pretty_str);
+			return effz::wstr_to_str(density_pretty_str);
 		}
 
 		symbolic_asf::symbolic_asf(const occ_nums_array &g)
@@ -370,11 +370,11 @@ namespace eff_z{
 					sympy_Object_to_string(asf_ptr.get(),"pretty")) { }
 
 		std::string symbolic_asf::get_asf_latex_str(){
-			return eff_z::wstr_to_str(asf_latex_str);
+			return effz::wstr_to_str(asf_latex_str);
 		}
 
 		std::string symbolic_asf::get_asf_pretty_str(){
-			return eff_z::wstr_to_str(asf_pretty_str);
+			return effz::wstr_to_str(asf_pretty_str);
 		}
 	} /* end namespace zeroth_order */
-} /* end namespace eff_z */
+} /* end namespace effz */

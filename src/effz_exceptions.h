@@ -19,7 +19,7 @@ limitations under the License.
 
 #include <stdexcept>
 
-namespace eff_z{
+namespace effz{
 
 	class python_exception : public std::runtime_error{
 		public:
@@ -32,7 +32,7 @@ namespace eff_z{
 			explicit parsing_exception(const char* what_arg)
 				: std::runtime_error(what_arg) {}
 	};
-} /* end namespace eff_z */
+} /* end namespace effz */
 
 
 #endif /* EFFZ_EXCEPTIONS_H */

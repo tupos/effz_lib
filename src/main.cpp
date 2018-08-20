@@ -23,7 +23,7 @@ limitations under the License.
 #include <csignal>
 #include <iostream>
 
-using namespace eff_z;
+using namespace effz;
 
 
 int main(int argc, char *argv[]) try {
