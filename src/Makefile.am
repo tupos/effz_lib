@@ -2,22 +2,22 @@
 lib_LTLIBRARIES = libeffzlib.la
 
 libeffzlib_la_SOURCES = effz_atomic_data.cpp effz_config.cpp\
-			   effz_exceptions.cpp effz_python_utility.cpp\
-			   effz_spec_func.cpp effz_utility.cpp\
-			   effz_zeroth_order.cpp effz_zeroth_order_python.cpp\
-			   main.cpp
+						effz_python_utility.cpp\
+						effz_spec_func.cpp effz_utility.cpp\
+						effz_zeroth_order.cpp effz_zeroth_order_python.cpp\
+						main.cpp
 
 pkginclude_HEADERS = effz_atomic_data.h effz_config.h\
-								  effz_exceptions.h\
-								  effz_integration.h effz_parallel_func.h\
-								  effz_python_utility.h effz_spec_func.h\
-								  effz_typedefs.h effz_utility.h\
-								  effz_zeroth_order.h\
-								  effz_zeroth_order_python.h
+					 effz_exceptions.h\
+					 effz_integration.h effz_parallel_func.h\
+					 effz_python_utility.h effz_spec_func.h\
+					 effz_typedefs.h effz_utility.h\
+					 effz_zeroth_order.h\
+					 effz_zeroth_order_python.h
 
 libeffzlib_la_CPPFLAGS = -I$(top_srcdir)/src @PYTHONINCLUDE@\
-				@GSLCPPFLAGS@ @TBBCPPFLAGS@\
-				-DEFFZ_PYTHON_SRC_DIR='"$(effzpythondir)"'
+						 @GSLCPPFLAGS@ @TBBCPPFLAGS@\
+						 -DEFFZ_PYTHON_SRC_DIR='"$(effzpythondir)"'
 
 libeffzlib_la_LDFLAGS = -version-info 1:1:1
 
