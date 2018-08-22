@@ -6,6 +6,7 @@
 *.swp
 *.lo
 /**.txt*/
+effz_lib/effz*.h
 .ipynb_checkpoints
 Makefile
 Makefile.in
