@@ -1,6 +1,7 @@
-## effz - Effective charge program
+## effz_lib - Library for the effective charge program
 
 This is effz_lib, a library for the acompaniying effz program.
+
 Contents
 --------
 
