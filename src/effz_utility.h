@@ -48,6 +48,11 @@ namespace effz{
 	void print_occ_nums(std::ostream &stream, const occ_nums_array &g);
 	std::string wstr_to_str(const std::wstring &wstr);
 
+	void cpp_occ_nums_to_c(const occ_nums_array &arr,
+			effz_occ_num_t *out, size_t *dim);
+	std::vector<std::array<int,4>> c_occ_nums_to_cpp(
+			const effz_occ_num_t *arr, size_t dim);
+
 	void print_gsl_matrix_int(gsl_matrix_int *m);
 	void print_gsl_vector_int(gsl_vector_int *v);
 	void print_gsl_matrix(gsl_matrix *m);

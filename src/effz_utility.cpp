@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "effz_utility.h"
+#include "effz_typedefs.h"
 
 #include <locale>
 #include <codecvt>
@@ -53,6 +54,31 @@ namespace effz{
 		std::wstring_convert<convert_typeX, wchar_t> converterX;
 
 		return converterX.to_bytes(wstr);
+	}
+
+	void cpp_occ_nums_to_c(const occ_nums_array &arr,
+			effz_occ_num_t *out, size_t *dim)
+	{
+		*dim = arr.size();
+		for(std::size_t i = 0; i < arr.size(); ++i){
+			for(std::size_t j = 0; j < 4; ++j){
+				out[i].num[j] = arr[i][j];
+			}
+		}
+	}
+
+	std::vector<std::array<int,4>> c_occ_nums_to_cpp(
+			const effz_occ_num_t *arr, size_t dim)
+	{
+		occ_nums_array nums;
+		for(std::size_t i = 0; i < dim; ++i){
+			std::array<int,4> num;
+			for(std::size_t j = 0; j < 4; ++j){
+				num[j] = arr[i].num[j];
+			}
+			nums.push_back(num);
+		}
+		return nums;
 	}
 
 	void print_gsl_matrix_int(gsl_matrix_int *m){

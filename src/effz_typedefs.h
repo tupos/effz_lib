@@ -17,6 +17,7 @@ limitations under the License.
 #ifndef EFFZ_TYPEDEFS_H
 #define EFFZ_TYPEDEFS_H
 
+#ifdef __cplusplus
 #include <vector>
 #include <array>
 
@@ -25,5 +26,17 @@ namespace effz{
 	typedef std::vector<std::array<int,4>> occ_nums_array;
 
 } /* end namespace effz */
+#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
+	struct effz_occ_num_struct{
+		int num[4];
+	};
+	typedef struct effz_occ_num_struct effz_occ_num_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* EFFZ_TYPEDEFS_H */

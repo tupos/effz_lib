@@ -1,11 +1,11 @@
 /*
-Copyright 2018 Oleg Skoromnik
+   Copyright 2018 Oleg Skoromnik
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,14 +26,337 @@ limitations under the License.
 #include "cereal/types/tuple.hpp"
 #include "cereal/archives/json.hpp"
 
+#include <gsl/gsl_sf_coupling.h>
+#include <array>
+#include <vector>
+#include <string>
 #include <iostream>
 #include <exception>
 #include <fstream>
 #include <tuple>
 #include <algorithm>
 
-namespace effz{
-	namespace zeroth_order{
+namespace effz {
+	namespace zeroth_order {
+		namespace {
+
+			class i_direct_database
+			{
+				private:
+					std::string path_to_data;
+
+					typedef std::tuple<std::array<int,5>,double> elem_t;
+					std::vector<elem_t> database;
+
+					friend double i_direct(
+							const int n,
+							const int l,
+							const int n1,
+							const int l1,
+							const int k);
+
+					void calculate_database();
+					void save_database(std::fstream &s);
+					void load_database(std::fstream &s);
+
+				public:
+					i_direct_database(const std::string &path_to_data
+							= config::shared_config().get_database_dir()
+							+ "/i_direct_database.txt");
+
+					double get_i_direct(
+							const int n,
+							const int l,
+							const int n1,
+							const int l1,
+							const int k);
+
+			};
+
+			class i_exchange_database
+			{
+				private:
+					std::string path_to_data;
+
+					typedef std::tuple<std::array<int,5>,double> elem_t;
+					std::vector<elem_t> database;
+
+					friend double i_exchange(
+							const int n,
+							const int l,
+							const int n1,
+							const int l1,
+							const int k);
+
+					void calculate_database();
+					void save_database(std::fstream &s);
+					void load_database(std::fstream &s);
+
+				public:
+					i_exchange_database(const std::string &path_to_data
+							= config::shared_config().get_database_dir()
+							+ "/i_exchange_database.txt");
+
+					double get_i_exchange(
+							const int n,
+							const int l,
+							const int n1,
+							const int l1,
+							const int k);
+
+			};
+
+			void i_direct_database::calculate_database()
+			{
+				std::vector<std::array<int,5>> direct_quantum_nums;
+				for(int n = 1; n <= 6; ++n){
+					for(int l = 0; l <= n - 1; ++l){
+						for(int n1 = 1; n1 <= 6; ++n1){
+							for(int l1 = 0; l1 <= n1 - 1; ++l1){
+								for(int k = 0; k <= std::min(l,l1); ++k){
+									direct_quantum_nums
+										.push_back({n,l,n1,l1,2*k});
+								}
+							}
+						}
+					}
+				}
+
+				for(int n = 1; n <= 6; ++n){
+					for(int l = 0; l <= n - 1; ++l){
+						for(int l1 = 0; l1 <= 2; ++l1){
+							for(int k = 0; k <= std::min(l,l1); ++k){
+								direct_quantum_nums
+									.push_back({n,l,7,l1,2*k});
+							}
+						}
+					}
+				}
+
+				for(int n1 = 1; n1 <= 6; ++n1){
+					for(int l1 = 0; l1 <= n1 - 1; ++l1){
+						for(int l = 0; l <= 2; ++l){
+							for(int k = 0; k <= std::min(l,l1); ++k){
+								direct_quantum_nums
+									.push_back({7,l,n1,l1,2*k});
+							}
+						}
+					}
+				}
+
+				for(int l = 0; l <= 2; ++l){
+					for(int l1 = 0; l1 <= 2; ++l1){
+						for(int k = 0; k <= std::min(l,l1); ++k){
+							direct_quantum_nums.push_back({7,l,7,l1,2*k});
+						}
+					}
+				}
+
+				auto f_to_map
+					= [](const std::array<int,5> &arr)
+					-> std::tuple<std::array<int,5>, double>{
+						return std::make_tuple(
+								arr,
+								i_direct(
+									arr[0],
+									arr[1],
+									arr[2],
+									arr[3],
+									arr[4])
+								);
+					};
+
+				database = effz::parallel::parallel_table(
+						direct_quantum_nums, f_to_map);
+			}
+
+			void i_direct_database::save_database(std::fstream &s)
+			{
+				cereal::JSONOutputArchive output(s);
+				output(CEREAL_NVP(database));
+			}
+
+			void i_direct_database::load_database(std::fstream &s)
+			{
+				cereal::JSONInputArchive input(s);
+				input(CEREAL_NVP(database));
+			}
+
+			i_direct_database::i_direct_database(
+					const std::string &path_to_data)
+				: path_to_data(path_to_data), database()
+			{
+				std::fstream s;
+				try{
+					s.open(path_to_data);
+					if(!s.is_open()){
+						s.open(path_to_data, s.out | s.trunc);
+						//std::cout << "calc" << "\n";
+						calculate_database();
+						save_database(s);
+					} else {
+						//std::cout << "load" << "\n";
+						load_database(s);
+					}
+				} catch (const std::exception &e){
+					std::cerr << "error happened" << e.what();
+					throw;
+				}
+				s.close();
+			}
+
+			double i_direct_database::get_i_direct(
+					const int n,
+					const int l,
+					const int n1,
+					const int l1,
+					const int k)
+			{
+				auto find_i_direct
+					= [n,l,n1,l1,k](
+							const std::tuple<std::array<int,5>, double> &el)
+					-> bool
+					{
+						return std::get<0>(el)
+							== std::array<int,5>({n,l,n1,l1,k});
+					};
+				auto element = std::find_if(
+						database.cbegin(),
+						database.cend(),
+						find_i_direct);
+				if(element != database.cend()){
+					return std::get<1>(*element);
+				} else {
+					return i_direct(n,l,n1,l1,k);
+				}
+			}
+
+			void i_exchange_database::calculate_database()
+			{
+				std::vector<std::array<int,5>> exchange_quantum_nums;
+				for(int n = 1; n <= 6; ++n){
+					for(int l = 0; l <= n - 1; ++l){
+						for(int n1 = 1; n1 <= 6; ++n1){
+							for(int l1 = 0; l1 <= n1 - 1; ++l1){
+								for(int k = std::abs(l-l1); k <= l+l1; ++k){
+									exchange_quantum_nums
+										.push_back({n,l,n1,l1,k});
+								}
+							}
+						}
+					}
+				}
+
+				for(int n = 1; n <= 6; ++n){
+					for(int l = 0; l <= n - 1; ++l){
+						for(int l1 = 0; l1 <= 1; ++l1){
+							for(int k = std::abs(l-l1); k <= l+l1; ++k){
+								exchange_quantum_nums
+									.push_back({n,l,7,l1,k});
+							}
+						}
+					}
+				}
+
+				for(int n1 = 1; n1 <= 6; ++n1){
+					for(int l1 = 0; l1 <= n1 - 1; ++l1){
+						for(int l = 0; l <= 1; ++l){
+							for(int k = std::abs(l-l1); k <= l+l1; ++k){
+								exchange_quantum_nums
+									.push_back({7,l,n1,l1,k});
+							}
+						}
+					}
+				}
+
+				for(int l = 0; l <= 1; ++l){
+					for(int l1 = 0; l1 <= 1; ++l1){
+						for(int k = std::abs(l-l1); k <= l+l1; ++k){
+							exchange_quantum_nums.push_back({7,l,7,l1,k});
+						}
+					}
+				}
+
+				auto f_to_map
+					= [](const std::array<int,5> &arr)
+					-> std::tuple<std::array<int,5>, double>{
+						return std::make_tuple(
+								arr,
+								i_exchange(
+									arr[0],
+									arr[1],
+									arr[2],
+									arr[3],
+									arr[4])
+								);
+					};
+
+				database = effz::parallel::parallel_table(
+						exchange_quantum_nums, f_to_map);
+			}
+
+			void i_exchange_database::save_database(std::fstream &s)
+			{
+				cereal::JSONOutputArchive output(s);
+				output(CEREAL_NVP(database));
+			}
+
+			void i_exchange_database::load_database(std::fstream &s)
+			{
+				cereal::JSONInputArchive input(s);
+				input(CEREAL_NVP(database));
+			}
+
+			i_exchange_database::i_exchange_database(
+					const std::string &path_to_data)
+				: path_to_data(path_to_data), database()
+			{
+				std::fstream s;
+				try{
+					s.open(path_to_data);
+					if(!s.is_open()){
+						s.open(path_to_data, s.out | s.trunc);
+						//std::cout << "calc" << "\n";
+						calculate_database();
+						save_database(s);
+					} else {
+						//std::cout << "load" << "\n";
+						load_database(s);
+					}
+				} catch (const std::exception &e){
+					std::cerr << "error happened " << e.what();
+					throw;
+				}
+				s.close();
+			}
+
+			double i_exchange_database::get_i_exchange(
+					const int n,
+					const int l,
+					const int n1,
+					const int l1,
+					const int k)
+			{
+				auto find_i_exchange
+					= [n,l,n1,l1,k](
+							const std::tuple<std::array<int,5>, double> &el)
+					-> bool
+					{
+						return std::get<0>(el)
+							== std::array<int,5>({n,l,n1,l1,k});
+					};
+				auto element = std::find_if(
+						database.cbegin(),
+						database.cend(),
+						find_i_exchange);
+				if(element != database.cend()){
+					return std::get<1>(*element);
+				} else {
+					return i_exchange(n,l,n1,l1,k);
+				}
+			}
+
+		} /* end anonymous namespace */
 
 		double three_j_prod_direct(
 				const int l,
@@ -100,126 +423,6 @@ namespace effz{
 		}
 
 
-		void i_direct_database::calculate_database(){
-
-			std::vector<std::array<int,5>> direct_quantum_nums;
-			for(int n = 1; n <= 6; ++n){
-				for(int l = 0; l <= n - 1; ++l){
-					for(int n1 = 1; n1 <= 6; ++n1){
-						for(int l1 = 0; l1 <= n1 - 1; ++l1){
-							for(int k = 0; k <= std::min(l,l1); ++k){
-								direct_quantum_nums
-									.push_back({n,l,n1,l1,2*k});
-							}
-						}
-					}
-				}
-			}
-
-			for(int n = 1; n <= 6; ++n){
-				for(int l = 0; l <= n - 1; ++l){
-					for(int l1 = 0; l1 <= 2; ++l1){
-						for(int k = 0; k <= std::min(l,l1); ++k){
-							direct_quantum_nums
-								.push_back({n,l,7,l1,2*k});
-						}
-					}
-				}
-			}
-
-			for(int n1 = 1; n1 <= 6; ++n1){
-				for(int l1 = 0; l1 <= n1 - 1; ++l1){
-					for(int l = 0; l <= 2; ++l){
-						for(int k = 0; k <= std::min(l,l1); ++k){
-							direct_quantum_nums
-								.push_back({7,l,n1,l1,2*k});
-						}
-					}
-				}
-			}
-
-			for(int l = 0; l <= 2; ++l){
-				for(int l1 = 0; l1 <= 2; ++l1){
-					for(int k = 0; k <= std::min(l,l1); ++k){
-						direct_quantum_nums.push_back({7,l,7,l1,2*k});
-					}
-				}
-			}
-
-			auto f_to_map
-				= [](const std::array<int,5> &arr)
-				-> std::tuple<std::array<int,5>, double>{
-					return std::make_tuple(
-							arr,
-							i_direct(
-								arr[0],
-								arr[1],
-								arr[2],
-								arr[3],
-								arr[4])
-							);
-				};
-
-			database = effz::parallel::parallel_table(
-					direct_quantum_nums, f_to_map);
-		}
-
-		void i_direct_database::save_database(std::fstream &s){
-				cereal::JSONOutputArchive output(s);
-				output(CEREAL_NVP(database));
-		}
-
-		void i_direct_database::load_database(std::fstream &s){
-				cereal::JSONInputArchive input(s);
-				input(CEREAL_NVP(database));
-		}
-
-		i_direct_database::i_direct_database(
-				const std::string &path_to_data)
-			: path_to_data(path_to_data), database() {
-				std::fstream s;
-				try{
-					s.open(path_to_data);
-					if(!s.is_open()){
-						s.open(path_to_data, s.out | s.trunc);
-						//std::cout << "calc" << "\n";
-						calculate_database();
-						save_database(s);
-					} else {
-						//std::cout << "load" << "\n";
-						load_database(s);
-					}
-				} catch (const std::exception &e){
-					std::cerr << "error happened" << e.what();
-					throw;
-				}
-				s.close();
-			}
-
-		double i_direct_database::get_i_direct(
-				const int n,
-				const int l,
-				const int n1,
-				const int l1,
-				const int k){
-			auto find_i_direct
-				= [n,l,n1,l1,k](
-						const std::tuple<std::array<int,5>, double> &el)
-				-> bool
-				{
-					return std::get<0>(el)
-						== std::array<int,5>({n,l,n1,l1,k});
-				};
-			auto element = std::find_if(
-					database.cbegin(),
-					database.cend(),
-					find_i_direct);
-			if(element != database.cend()){
-				return std::get<1>(*element);
-			} else {
-				return i_direct(n,l,n1,l1,k);
-			}
-		}
 
 		double i_direct_data_test(
 				const int n,
@@ -304,126 +507,6 @@ namespace effz{
 			return effz::integration::int_0_inf(integral);
 		}
 
-		void i_exchange_database::calculate_database(){
-
-			std::vector<std::array<int,5>> exchange_quantum_nums;
-			for(int n = 1; n <= 6; ++n){
-				for(int l = 0; l <= n - 1; ++l){
-					for(int n1 = 1; n1 <= 6; ++n1){
-						for(int l1 = 0; l1 <= n1 - 1; ++l1){
-							for(int k = std::abs(l-l1); k <= l+l1; ++k){
-								exchange_quantum_nums
-									.push_back({n,l,n1,l1,k});
-							}
-						}
-					}
-				}
-			}
-
-			for(int n = 1; n <= 6; ++n){
-				for(int l = 0; l <= n - 1; ++l){
-					for(int l1 = 0; l1 <= 1; ++l1){
-						for(int k = std::abs(l-l1); k <= l+l1; ++k){
-							exchange_quantum_nums
-								.push_back({n,l,7,l1,k});
-						}
-					}
-				}
-			}
-
-			for(int n1 = 1; n1 <= 6; ++n1){
-				for(int l1 = 0; l1 <= n1 - 1; ++l1){
-					for(int l = 0; l <= 1; ++l){
-						for(int k = std::abs(l-l1); k <= l+l1; ++k){
-							exchange_quantum_nums
-								.push_back({7,l,n1,l1,k});
-						}
-					}
-				}
-			}
-
-			for(int l = 0; l <= 1; ++l){
-				for(int l1 = 0; l1 <= 1; ++l1){
-					for(int k = std::abs(l-l1); k <= l+l1; ++k){
-						exchange_quantum_nums.push_back({7,l,7,l1,k});
-					}
-				}
-			}
-
-			auto f_to_map
-				= [](const std::array<int,5> &arr)
-				-> std::tuple<std::array<int,5>, double>{
-					return std::make_tuple(
-							arr,
-							i_exchange(
-								arr[0],
-								arr[1],
-								arr[2],
-								arr[3],
-								arr[4])
-							);
-				};
-
-			database = effz::parallel::parallel_table(
-					exchange_quantum_nums, f_to_map);
-		}
-
-		void i_exchange_database::save_database(std::fstream &s){
-				cereal::JSONOutputArchive output(s);
-				output(CEREAL_NVP(database));
-		}
-
-		void i_exchange_database::load_database(std::fstream &s){
-				cereal::JSONInputArchive input(s);
-				input(CEREAL_NVP(database));
-		}
-
-		i_exchange_database::i_exchange_database(
-				const std::string &path_to_data)
-			: path_to_data(path_to_data), database() {
-				std::fstream s;
-				try{
-					s.open(path_to_data);
-					if(!s.is_open()){
-						s.open(path_to_data, s.out | s.trunc);
-						//std::cout << "calc" << "\n";
-						calculate_database();
-						save_database(s);
-					} else {
-						//std::cout << "load" << "\n";
-						load_database(s);
-					}
-				} catch (const std::exception &e){
-					std::cerr << "error happened " << e.what();
-					throw;
-				}
-				s.close();
-			}
-
-		double i_exchange_database::get_i_exchange(
-				const int n,
-				const int l,
-				const int n1,
-				const int l1,
-				const int k){
-			auto find_i_exchange
-				= [n,l,n1,l1,k](
-						const std::tuple<std::array<int,5>, double> &el)
-				-> bool
-				{
-					return std::get<0>(el)
-						== std::array<int,5>({n,l,n1,l1,k});
-				};
-			auto element = std::find_if(
-					database.cbegin(),
-					database.cend(),
-					find_i_exchange);
-			if(element != database.cend()){
-				return std::get<1>(*element);
-			} else {
-				return i_exchange(n,l,n1,l1,k);
-			}
-		}
 
 		double v_direct(
 				const int n,
@@ -460,7 +543,8 @@ namespace effz{
 			return sum;
 		}
 
-		double v_direct_total(const occ_nums_array &g){
+		double v_direct_total(const occ_nums_array &g)
+		{
 			i_direct_database i_d;
 			double sum = 0.;
 			for(auto &g_i: g){
@@ -481,7 +565,8 @@ namespace effz{
 			return sum;
 		}
 
-		double v_exchange_total(const occ_nums_array &g){
+		double v_exchange_total(const occ_nums_array &g)
+		{
 			i_exchange_database i_e;
 			double sum = 0.;
 			for(auto &g_i: g){
@@ -505,7 +590,8 @@ namespace effz{
 			return sum;
 		}
 
-		double v_direct_total_par(const occ_nums_array &g){
+		double v_direct_total_par(const occ_nums_array &g)
+		{
 			double sum = 0.;
 			std::vector<std::array<int,6>>
 				occ_nums_array;
@@ -525,8 +611,8 @@ namespace effz{
 			return sum;
 		}
 
-		double v_exchange_total_par(
-				const occ_nums_array &g){
+		double v_exchange_total_par(const occ_nums_array &g)
+		{
 			double sum = 0.;
 			std::vector<std::array<int,8>>
 				occ_nums_array;
@@ -548,15 +634,18 @@ namespace effz{
 			return sum;
 		}
 
-		double v_total(const occ_nums_array &g){
+		double v_total(const occ_nums_array &g)
+		{
 			return v_direct_total(g) - v_exchange_total(g);
 		}
 
-		double v_total_par(const occ_nums_array &g){
+		double v_total_par(const occ_nums_array &g)
+		{
 			return v_direct_total_par(g) - v_exchange_total_par(g);
 		}
 
-		double a(const occ_nums_array &g){
+		double a(const occ_nums_array &g)
+		{
 			double sum = 0.;
 			for(auto &g_i: g){
 				double n = static_cast<double>(g_i[0]);
@@ -565,26 +654,31 @@ namespace effz{
 			return sum;
 		}
 
-		double z_star_0th(double z, const occ_nums_array &g){
+		double z_star_0th(double z, const occ_nums_array &g)
+		{
 			return z - v_total(g) / (2. * a(g));
 		}
 
-		double e_0th(double z,const occ_nums_array &g){
+		double e_0th(double z,const occ_nums_array &g)
+		{
 			double z_star = z_star_0th(z,g);
 			return -a(g) * z_star * z_star;
 		}
 
-		double z_star_0th_par(double z, const occ_nums_array &g){
+		double z_star_0th_par(double z, const occ_nums_array &g)
+		{
 			return z - v_total_par(g) / (2. * a(g));
 		}
 
-		double e_0th_par(double z, const occ_nums_array &g){
+		double e_0th_par(double z, const occ_nums_array &g)
+		{
 			double z_star = z_star_0th_par(z,g);
 			return -a(g) * z_star * z_star;
 		}
 
 		std::tuple<double,double> z_star_and_e_0th_par(double z,
-				const occ_nums_array &g){
+				const occ_nums_array &g)
+		{
 			//double z_star = z_star_0th_par(z,g);
 			double z_star = z_star_0th(z,g);
 			return std::make_tuple(z_star, -a(g) * z_star * z_star);
@@ -598,7 +692,8 @@ namespace effz{
 		double density_0th::operator()(
 				const double r,
 				const double theta,
-				const double phi) const {
+				const double phi) const
+		{
 			double sum = 0.;
 			for(const auto &g_i: occ_nums){
 				double h_rnl = effz::h_l_rnl(z,g_i[0],g_i[1], r);
@@ -613,3 +708,133 @@ namespace effz{
 	} /* end namespace zeroth_order */
 
 } /* end namespace effz */
+
+
+double effz_three_j_prod_direct(
+		const int l,
+		const int m,
+		const int l1,
+		const int m1,
+		const int k)
+{
+	return effz::zeroth_order::three_j_prod_direct(l,m,l1,m1,k);
+}
+
+double effz_i_direct(
+		const int n,
+		const int l,
+		const int n1,
+		const int l1,
+		const int k)
+{
+	return effz::zeroth_order::i_direct(n,l,n1,l1,k);
+}
+
+double effz_three_j_prod_exchange(
+		const int l,
+		const int m,
+		const int l1,
+		const int m1,
+		const int k)
+{
+	return effz::zeroth_order::three_j_prod_exchange(l,m,l1,m1,k);
+}
+
+double effz_i_exchange(
+		const int n,
+		const int l,
+		const int n1,
+		const int l1,
+		const int k)
+{
+	return effz::zeroth_order::i_exchange(n,l,n1,l1,k);
+}
+
+double effz_v_direct(
+		const int n,
+		const int l,
+		const int m,
+		const int n1,
+		const int l1,
+		const int m1)
+{
+	return effz::zeroth_order::v_direct(n,l,m,n1,l1,m1);
+}
+
+double effz_v_exchange(
+		const int n,
+		const int l,
+		const int m,
+		const int n1,
+		const int l1,
+		const int m1)
+{
+	return effz::zeroth_order::v_exchange(n,l,m,n1,l1,m1);
+}
+
+double effz_v_direct_total(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::v_direct_total(arr);
+}
+
+double effz_v_exchange_total(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::v_exchange_total(arr);
+}
+
+double effz_v_direct_total_par(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::v_direct_total_par(arr);
+}
+
+double effz_v_exchange_total_par(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::v_exchange_total_par(arr);
+}
+
+double effz_v_total(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::v_total(arr);
+}
+
+double effz_v_total_par(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::v_total_par(arr);
+}
+
+double effz_a(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::a(arr);
+}
+
+double effz_z_star_0th(double z, const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::z_star_0th(z,arr);
+}
+
+double effz_e_0th(double z, const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::e_0th(z,arr);
+}
+
+double effz_z_star_0th_par(double z,
+		const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::z_star_0th_par(z,arr);
+}
+
+double effz_e_0th_par(double z, const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::e_0th_par(z,arr);
+}

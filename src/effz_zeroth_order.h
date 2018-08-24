@@ -20,13 +20,13 @@ limitations under the License.
 #include "effz_typedefs.h"
 #include "effz_config.h"
 
-#include <gsl/gsl_sf_coupling.h>
-#include <array>
-#include <vector>
-#include <string>
+#ifdef __cplusplus
 
 namespace effz{
 	namespace zeroth_order{
+		/*
+		 *In this file "par" means parallel function
+		 */
 		double three_j_prod_direct(
 				const int l,
 				const int m,
@@ -41,38 +41,6 @@ namespace effz{
 				const int l1,
 				const int k);
 
-		class i_direct_database{
-			private:
-				std::string path_to_data;
-
-				typedef std::tuple<std::array<int,5>,double> elem_t;
-				std::vector<elem_t> database;
-
-				friend double i_direct(
-						const int n,
-						const int l,
-						const int n1,
-						const int l1,
-						const int k);
-
-				void calculate_database();
-				void save_database(std::fstream &s);
-				void load_database(std::fstream &s);
-
-			public:
-				i_direct_database(const std::string &path_to_data
-						= config::shared_config().get_database_dir()
-						+ "/i_direct_database.txt");
-
-				double get_i_direct(
-						const int n,
-						const int l,
-						const int n1,
-						const int l1,
-						const int k);
-
-		};
-
 		double three_j_prod_exchange(
 				const int l,
 				const int m,
@@ -86,38 +54,6 @@ namespace effz{
 				const int n1,
 				const int l1,
 				const int k);
-
-		class i_exchange_database{
-			private:
-				std::string path_to_data;
-
-				typedef std::tuple<std::array<int,5>,double> elem_t;
-				std::vector<elem_t> database;
-
-				friend double i_exchange(
-						const int n,
-						const int l,
-						const int n1,
-						const int l1,
-						const int k);
-
-				void calculate_database();
-				void save_database(std::fstream &s);
-				void load_database(std::fstream &s);
-
-			public:
-				i_exchange_database(const std::string &path_to_data
-						= config::shared_config().get_database_dir()
-						+ "/i_exchange_database.txt");
-
-				double get_i_exchange(
-						const int n,
-						const int l,
-						const int n1,
-						const int l1,
-						const int k);
-
-		};
 
 		double v_direct(
 				const int n,
@@ -161,9 +97,8 @@ namespace effz{
 		std::tuple<double,double> z_star_and_e_0th_par(double z,
 				const occ_nums_array &g);
 
-
-
-		class density_0th{
+		class density_0th
+		{
 			private:
 				double z;
 				occ_nums_array occ_nums;
@@ -178,5 +113,78 @@ namespace effz{
 	} /*end namespace zeroth_order*/
 
 } /*end namespace effz*/
+#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
+	double effz_three_j_prod_direct(
+			const int l,
+			const int m,
+			const int l1,
+			const int m1,
+			const int k);
 
+	double effz_i_direct(
+			const int n,
+			const int l,
+			const int n1,
+			const int l1,
+			const int k);
+
+	double effz_three_j_prod_exchange(
+			const int l,
+			const int m,
+			const int l1,
+			const int m1,
+			const int k);
+
+	double effz_i_exchange(
+			const int n,
+			const int l,
+			const int n1,
+			const int l1,
+			const int k);
+
+	double effz_v_direct(
+			const int n,
+			const int l,
+			const int m,
+			const int n1,
+			const int l1,
+			const int m1);
+
+	double effz_v_exchange(
+			const int n,
+			const int l,
+			const int m,
+			const int n1,
+			const int l1,
+			const int m1);
+
+	double effz_v_direct_total(const effz_occ_num_t *g, size_t dim);
+
+	double effz_v_exchange_total(const effz_occ_num_t *g, size_t dim);
+
+	double effz_v_direct_total_par(const effz_occ_num_t *g, size_t dim);
+
+	double effz_v_exchange_total_par(const effz_occ_num_t *g, size_t dim);
+
+	double effz_v_total(const effz_occ_num_t *g, size_t dim);
+
+	double effz_v_total_par(const effz_occ_num_t *g, size_t dim);
+
+	double effz_a(const effz_occ_num_t *g, size_t dim);
+
+	double effz_z_star_0th(double z, const effz_occ_num_t *g, size_t dim);
+
+	double effz_e_0th(double z, const effz_occ_num_t *g, size_t dim);
+
+	double effz_z_star_0th_par(double z,
+			const effz_occ_num_t *g, size_t dim);
+
+	double effz_e_0th_par(double z, const effz_occ_num_t *g, size_t dim);
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* EFFZ_ZEROTH_ORDER_H */
