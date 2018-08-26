@@ -21,6 +21,7 @@ limitations under the License.
 
 #include <iostream>
 #include <functional>
+#include <cstring>
 
 
 namespace effz{
@@ -378,3 +379,122 @@ namespace effz{
 		}
 	} /* end namespace zeroth_order */
 } /* end namespace effz */
+
+PyObject* effz_computed_rho_h_l(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::computed_rho_h_l(arr);
+}
+
+PyObject* effz_computed_rho_h_l_fourier(const effz_occ_num_t *g,
+		size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::computed_rho_h_l_fourier(arr);
+}
+
+PyObject* effz_computed_asf_h_l(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	return effz::zeroth_order::computed_asf_h_l(arr);
+}
+
+void effz_print_rho_h_l(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	effz::zeroth_order::print_rho_h_l(arr);
+}
+
+void effz_print_rho_h_l_fourier(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	effz::zeroth_order::print_rho_h_l_fourier(arr);
+}
+
+void effz_print_asf_h_l(const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
+	effz::zeroth_order::print_asf_h_l(arr);
+}
+
+effz_symbolic_density_0th_t effz_symbolic_density_0th_new(
+		const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array g_arr = effz::c_occ_nums_to_cpp(g, dim);
+	return reinterpret_cast<void*>(
+			new effz::zeroth_order::symbolic_density(g_arr));
+}
+
+void effz_symbolic_density_0th_delete(effz_symbolic_density_0th_t rho)
+{
+	delete reinterpret_cast<effz::zeroth_order::symbolic_density*>(rho);
+}
+
+int effz_symbolic_density_0th_get_pretty_str(
+		const effz_symbolic_density_0th_t rho, char** str, size_t *len)
+{
+	const char* rho_str
+		= reinterpret_cast<effz::zeroth_order::symbolic_density*>(rho)
+		->get_density_pretty_str().c_str();
+	char *dest = (char*)malloc((strlen(rho_str)+1)*sizeof(char));
+	strcpy(dest, rho_str);
+	*str = dest;
+	*len = strlen(dest);
+
+	return 0;
+}
+
+int effz_symbolic_density_0th_get_latex_str(
+		const effz_symbolic_density_0th_t rho, char** str, size_t *len)
+{
+	const char* rho_str
+		= reinterpret_cast<effz::zeroth_order::symbolic_density*>(rho)
+		->get_density_latex_str().c_str();
+	char *dest = (char*)malloc((strlen(rho_str)+1)*sizeof(char));
+	strcpy(dest, rho_str);
+	*str = dest;
+	*len = strlen(dest);
+
+	return 0;
+}
+
+effz_symbolic_asf_0th_t effz_symbolic_asf_0th_new(
+		const effz_occ_num_t *g, size_t dim)
+{
+	effz::occ_nums_array g_arr = effz::c_occ_nums_to_cpp(g, dim);
+	return reinterpret_cast<void*>(
+			new effz::zeroth_order::symbolic_asf(g_arr));
+}
+
+void effz_symbolic_asf_0th_delete(effz_symbolic_asf_0th_t rho)
+{
+	delete reinterpret_cast<effz::zeroth_order::symbolic_asf*>(rho);
+}
+
+int effz_symbolic_asf_0th_get_pretty_str(
+		const effz_symbolic_asf_0th_t asf, char** str, size_t *len)
+{
+	const char* asf_str
+		= reinterpret_cast<effz::zeroth_order::symbolic_asf*>(asf)
+		->get_asf_pretty_str().c_str();
+	char *dest = (char*)malloc((strlen(asf_str)+1)*sizeof(char));
+	strcpy(dest, asf_str);
+	*str = dest;
+	*len = strlen(dest);
+
+	return 0;
+}
+
+int effz_symbolic_asf_0th_get_latex_str(
+		const effz_symbolic_asf_0th_t asf, char** str, size_t *len)
+{
+	const char* asf_str
+		= reinterpret_cast<effz::zeroth_order::symbolic_asf*>(asf)
+		->get_asf_latex_str().c_str();
+	char *dest = (char*)malloc((strlen(asf_str)+1)*sizeof(char));
+	strcpy(dest, asf_str);
+	*str = dest;
+	*len = strlen(dest);
+
+	return 0;
+}

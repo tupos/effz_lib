@@ -17,7 +17,7 @@ limitations under the License.
 #ifndef EFFZ_ZEROTH_ORDER_H
 #define EFFZ_ZEROTH_ORDER_H
 
-#include "effz_typedefs.h"
+#include <effz_lib/effz_typedefs.h>
 
 #ifdef __cplusplus
 

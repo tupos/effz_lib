@@ -19,8 +19,9 @@ limitations under the License.
 
 #include <Python.h>
 
-#include "effz_typedefs.h"
+#include <effz_lib/effz_typedefs.h>
 
+#ifdef __cplusplus
 #include <vector>
 #include <array>
 #include <string>
@@ -66,5 +67,59 @@ namespace effz{
 
 	} /* end namespace zeroth_order */
 } /* end namespace effz */
+#endif
+#ifdef __cplusplus
+extern "C" {
+#endif
+	PyObject* effz_computed_rho_h_l(const effz_occ_num_t *g, size_t dim);
 
+	PyObject* effz_computed_rho_h_l_fourier(const effz_occ_num_t *g,
+			size_t dim);
+
+	PyObject* effz_computed_asf_h_l(const effz_occ_num_t *g, size_t dim);
+
+	void effz_print_rho_h_l(const effz_occ_num_t *g, size_t dim);
+
+	void effz_print_rho_h_l_fourier(const effz_occ_num_t *g, size_t dim);
+
+	void effz_print_asf_h_l(const effz_occ_num_t *g, size_t dim);
+
+	/*
+	 *symbolic density class start
+	 */
+	typedef void* effz_symbolic_density_0th_t;
+	effz_symbolic_density_0th_t effz_symbolic_density_0th_new(
+			const effz_occ_num_t *g, size_t dim);
+
+	void effz_symbolic_density_0th_delete(effz_symbolic_density_0th_t rho);
+
+	int effz_symbolic_density_0th_get_pretty_str(
+			const effz_symbolic_density_0th_t rho, char** str, size_t *len);
+
+	int effz_symbolic_density_0th_get_latex_str(
+			const effz_symbolic_density_0th_t rho, char** str, size_t *len);
+	/*
+	 *symbolic density class end
+	 */
+
+	/*
+	 *symbolic asf class start
+	 */
+	typedef void* effz_symbolic_asf_0th_t;
+	effz_symbolic_asf_0th_t effz_symbolic_asf_0th_new(
+			const effz_occ_num_t *g, size_t dim);
+
+	void effz_symbolic_asf_0th_delete(effz_symbolic_asf_0th_t rho);
+
+	int effz_symbolic_asf_0th_get_pretty_str(
+			const effz_symbolic_asf_0th_t asf, char** str, size_t *len);
+
+	int effz_symbolic_asf_0th_get_latex_str(
+			const effz_symbolic_asf_0th_t asf, char** str, size_t *len);
+	/*
+	 *symbolic asf class end
+	 */
+#ifdef __cplusplus
+}
+#endif
 #endif /* EFFZ_ZEROTH_ORDER_PYTHON_H */
