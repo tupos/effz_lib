@@ -192,7 +192,7 @@ extern "C" {
 
 	void effz_density_0th_delete(effz_density_0th_t rho);
 
-	double effz_density_0th_at(effz_density_0th_t rho,
+	double effz_density_0th_at(const effz_density_0th_t rho,
 			double r, double theta, double phi);
 	/*
 	 *density_0th class end
