@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "effz_zeroth_order.h"
 
+#include "effz_config.h"
 #include "effz_spec_func.h"
 #include "effz_utility.h"
 #include "effz_integration.h"
