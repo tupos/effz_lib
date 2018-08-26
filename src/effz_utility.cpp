@@ -67,7 +67,7 @@ namespace effz{
 		}
 	}
 
-	std::vector<std::array<int,4>> c_occ_nums_to_cpp(
+	occ_nums_array c_occ_nums_to_cpp(
 			const effz_occ_num_t *arr, size_t dim)
 	{
 		occ_nums_array nums;

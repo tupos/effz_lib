@@ -839,3 +839,24 @@ double effz_e_0th_par(double z, const effz_occ_num_t *g, size_t dim)
 	effz::occ_nums_array arr = effz::c_occ_nums_to_cpp(g,dim);
 	return effz::zeroth_order::e_0th_par(z,arr);
 }
+
+
+effz_density_0th_t effz_density_0th_new(double z,
+		const effz_occ_num_t *nums, size_t dim)
+{
+	effz::occ_nums_array g_arr = effz::c_occ_nums_to_cpp(nums, dim);
+	return reinterpret_cast<void*>(
+			new effz::zeroth_order::density_0th(z,g_arr));
+}
+
+void effz_density_0th_delete(effz_density_0th_t rho)
+{
+	delete reinterpret_cast<effz::zeroth_order::density_0th*>(rho);
+}
+
+double effz_density_0th_at(effz_density_0th_t rho,
+		double r, double theta, double phi)
+{
+	return reinterpret_cast<effz::zeroth_order::density_0th*>(rho)
+		->operator()(r, theta, phi);
+}

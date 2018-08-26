@@ -50,7 +50,7 @@ namespace effz{
 
 	void cpp_occ_nums_to_c(const occ_nums_array &arr,
 			effz_occ_num_t *out, size_t *dim);
-	std::vector<std::array<int,4>> c_occ_nums_to_cpp(
+	occ_nums_array c_occ_nums_to_cpp(
 			const effz_occ_num_t *arr, size_t dim);
 
 	void print_gsl_matrix_int(gsl_matrix_int *m);

@@ -183,6 +183,22 @@ extern "C" {
 
 	double effz_e_0th_par(double z, const effz_occ_num_t *g, size_t dim);
 
+	/*
+	 *density_0th class start
+	 */
+	typedef void* effz_density_0th_t;
+	effz_density_0th_t effz_density_0th_new(double z,
+			const effz_occ_num_t *nums, size_t dim);
+
+	void effz_density_0th_delete(effz_density_0th_t rho);
+
+	double effz_density_0th_at(effz_density_0th_t rho,
+			double r, double theta, double phi);
+	/*
+	 *density_0th class end
+	 */
+
+
 #ifdef __cplusplus
 }
 #endif
