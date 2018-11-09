@@ -17,7 +17,6 @@ limitations under the License.
 #ifndef EFFZ_CONFIG_H
 #define EFFZ_CONFIG_H
 
-#include <config.h>
 
 #include <string>
 

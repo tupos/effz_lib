@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <config.h>
 #include "effz_spec_func.h"
 
 #include <gsl/gsl_sf_coulomb.h>
