@@ -14,6 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#ifndef EFFZ_SECOND_ORDER_SINGLE_ANALYTIC_H
+#define EFFZ_SECOND_ORDER_SINGLE_ANALYTIC_H
+
+
+
 namespace effz{
 	namespace second_order{
 		namespace single{
@@ -21,3 +26,5 @@ namespace effz{
 		} /* end namespace single */
 	} /* end namespace second_order */
 } /* end namespace effz */
+
+#endif /* EFFZ_SECOND_ORDER_SINGLE_ANALYTIC_H */
