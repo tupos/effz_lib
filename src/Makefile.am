@@ -5,7 +5,8 @@ libeffzlib_la_SOURCES = effz_atomic_data.cpp effz_config.cpp\
 						effz_python_utility.cpp\
 						effz_spec_func.cpp effz_utility.cpp\
 						effz_zeroth_order.cpp effz_zeroth_order_python.cpp\
-						main.cpp
+						main.cpp\
+						effz_second_order_single_analytic.cpp
 
 pkginclude_HEADERS = effz_atomic_data.h effz_config.h\
 					 effz_exceptions.h\
@@ -13,7 +14,8 @@ pkginclude_HEADERS = effz_atomic_data.h effz_config.h\
 					 effz_python_utility.h effz_spec_func.h\
 					 effz_typedefs.h effz_utility.h\
 					 effz_zeroth_order.h\
-					 effz_zeroth_order_python.h
+					 effz_zeroth_order_python.h\
+					 effz_second_order_single_analytic.h
 
 libeffzlib_la_CPPFLAGS = -I$(top_srcdir)/src\
 						 -I$(top_builddir)/effz_lib @PYTHONINCLUDE@\
