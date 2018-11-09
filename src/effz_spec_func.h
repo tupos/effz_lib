@@ -16,7 +16,6 @@ limitations under the License.
 
 #ifndef EFFZ_SPEC_FUNC_H
 #define EFFZ_SPEC_FUNC_H
-#include <config.h>
 
 #include <complex>
 #include <array>
