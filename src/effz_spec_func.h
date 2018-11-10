@@ -28,6 +28,14 @@ namespace effz {
 	 *    h_l_*** --- hydrogen_like_***, i.e. charge != 1
 	 *    ***_gsl function with a signature of a gsl one
 	 */
+	inline int factorial_power(int x, int n)
+	{
+		int res = 1;
+		for(int i = 0; i < n; ++i){
+			res *= (x-i);
+		}
+		return res;
+	}
 
 	double h_rnl(const int n, const int l, const double r);
 
