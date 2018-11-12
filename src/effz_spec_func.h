@@ -19,6 +19,9 @@ limitations under the License.
 
 #include <complex>
 #include <array>
+#include <limits>
+#include <gsl/gsl_sf_gamma.h>
+#include <gsl/gsl_sf_psi.h>
 
 
 namespace effz {
@@ -28,13 +31,51 @@ namespace effz {
 	 *    h_l_*** --- hydrogen_like_***, i.e. charge != 1
 	 *    ***_gsl function with a signature of a gsl one
 	 */
-	inline int factorial_power(int x, int n)
+	inline double factorial_power(int x, int n)
 	{
 		int res = 1;
 		for(int i = 0; i < n; ++i){
 			res *= (x-i);
 		}
+		return static_cast<double>(res);
+	}
+
+	template<typename T>
+	inline T binpow(T a, int n)
+	{
+		T res = static_cast<T>(1);
+		if(a == static_cast<T>(0) && n == 0) return res;
+
+		int pow = n;
+		T base = a;
+		if(n < 0){
+			if(a == 0) return std::numeric_limits<T>::infinity();
+			pow = -n;
+			base = 1./a;
+		}
+
+		while(pow){
+			if(pow&1)
+				res *= base;
+			base *= base;
+			pow >>= 1;
+		}
 		return res;
+	}
+
+	inline double binomial(unsigned int n, unsigned int m)
+	{
+		return gsl_sf_choose(n,m);
+	}
+
+	inline double poly_gamma(unsigned n)
+	{
+		return gsl_sf_psi_int(n);
+	}
+
+	inline double factorial(unsigned int n)
+	{
+		return gsl_sf_fact(n);
 	}
 
 	double h_rnl(const int n, const int l, const double r);
