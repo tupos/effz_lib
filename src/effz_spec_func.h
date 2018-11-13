@@ -33,7 +33,7 @@ namespace effz {
 	 */
 	inline double factorial_power(int x, int n)
 	{
-		int res = 1;
+		long long int res = 1;
 		for(int i = 0; i < n; ++i){
 			res *= (x-i);
 		}

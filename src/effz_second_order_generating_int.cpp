@@ -28,7 +28,7 @@ namespace effz{
 					unsigned int n, double lambda,
 					int p, unsigned int i)
 			{
-				return static_cast<double>(binpow(n,i))
+				return binpow(n,i)
 					* binpow((static_cast<double>(n) * lambda + z),p+i)
 					* factorial_power(-p,i);
 			}
@@ -84,7 +84,7 @@ namespace effz{
 					unsigned int i, unsigned int j)
 			{
 				return (poly_gamma(n+l+1) - poly_gamma(n-l)
-						- static_cast<double>( 2*l+3)
+						- static_cast<double>(2*l+3)
 						/ static_cast<double>(2*n))
 					* binpow(4.*z*z,2*l+2)
 					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda,n-l-1,n+l+1,i)
@@ -114,7 +114,8 @@ namespace effz{
 					unsigned int l, double lambda, double lambda1,
 					unsigned int i, unsigned int j)
 			{
-				return static_cast<double>((n+l+1)/(2*n))
+				return static_cast<double>(n+l+1)
+					/ static_cast<double>(2*n)
 					* binpow(4.*z*z,2*l+3)
 					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda,n-l-1,n+l+2,i)
 					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda1,n-l-1,n+l+2,j);
@@ -124,7 +125,8 @@ namespace effz{
 					unsigned int l, double lambda, double lambda1,
 					unsigned int i, unsigned int j)
 			{
-				return static_cast<double>((n-l-1)/(2*n))
+				return static_cast<double>(n-l-1)
+					/ static_cast<double>(2*n)
 					* binpow(4.*z*z,2*l+2)
 					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda,n-l-2,n+l,i)
 					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda1,n-l-2,n+l,j);
@@ -134,7 +136,8 @@ namespace effz{
 					unsigned int l, double lambda, double lambda1,
 					unsigned int i, unsigned int j)
 			{
-				return -static_cast<double>((n-l-1)/(2*n))
+				return -static_cast<double>(n-l-1)
+					/ static_cast<double>(2*n)
 					* binpow(4.*z*z,2*l+3)
 					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda,n-l-2,n+l+1,i)
 					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda1,n-l-2,n+l+1,j);
@@ -158,14 +161,14 @@ namespace effz{
 								* z * (lambda+lambda1)
 								/ (nLpZ * nL1pZ));
 				}
+
 				auto der1_logNLpZfrac = [&n,&z](double L, int q, int p,
 						unsigned int ip){
 					auto term = [&](int s){
 						if(s < 0) return 0.;
 						int minus1_pow = (ip-s+1)&1 ? -1 : 1;
 						return binomial(ip,s) * minus1_pow
-							* binpow(n,ip-s)
-							/ binpow(static_cast<double>(n)*L+z, ip-s)
+							* binpow(n/(static_cast<double>(n)*L+z),ip-s)
 							* factorial(ip-s-1)
 							* der_NLmZpowQ_div_NLpZpowP(z,n,L,q,p,s);
 					};
@@ -180,46 +183,95 @@ namespace effz{
 					return a;
 				};
 
-				auto der1_log2NZLpL1frac = [&n,&z](double L, double L1,
+				auto der1_log2NZLpL1_and_logNLpZ_frac
+					= [&n,&z](double L, double L1,
 						int q, int p, unsigned int ip){
 					auto term = [&](int s){
-						if(s < 0) return 0.;
+						if(s < 0) return std::make_tuple(0.,0.);
 						int minus1_pow = (ip-s+1)&1 ? -1 : 1;
-						return binomial(ip,s) * minus1_pow
-							* binpow(L+L1, s-ip)
+						double factor = binomial(ip,s) * minus1_pow
 							* factorial(ip-s-1)
 							* der_NLmZpowQ_div_NLpZpowP(z,n,L,q,p,s);
+						double der_log2NZ = binpow(L+L1, s-ip);
+						double der_logNLpZ
+							= binpow(n/(static_cast<double>(n)*L+z),ip-s);
+
+						return std::make_tuple(
+								factor * der_log2NZ,
+								factor * der_logNLpZ
+								);
 					};
-					double a = std::log(2. * static_cast<double>(n) * z
-							* (L+L1))
-						* der_NLmZpowQ_div_NLpZpowP(z,n,L,q,p,ip);
+					double d = der_NLmZpowQ_div_NLpZpowP(z,n,L,q,p,ip);
+					double log2NZLpL1_d = std::log(2.
+							* static_cast<double>(n) * z * (L+L1)) * d;
+					double logNLpZ_d
+						= std::log(static_cast<double>(n) * L + z) * d;
+
 					if(ip-1 < 0){
-						return a;
+						return std::make_tuple(log2NZLpL1_d, logNLpZ_d);
 					}
 					for(int s = 0; s <= ip-1; ++s){
-						a += term(s);
+						auto tuple = term(s);
+						log2NZLpL1_d += std::get<0>(tuple);
+						logNLpZ_d += std::get<1>(tuple);
 					}
-					return a;
+					return std::make_tuple(log2NZLpL1_d, logNLpZ_d);
 				};
-				auto der1 = [&z,&n,&l,&der1_logNLpZfrac,
-					 &der1_log2NZLpL1frac](double L, double L1,
+				auto der1 = [&z,&n,&l,&der1_log2NZLpL1_and_logNLpZ_frac]
+					(double L, double L1,
 							 unsigned int ip){
 					double NL1mZ = static_cast<double>(n)*L1 - z;
 					double NL1pZ = static_cast<double>(n)*L1 + z;
 					double prefactor = binpow(NL1mZ, n-l-1)
 						/ binpow(NL1pZ, n+l+1);
-					return prefactor * (
-							der1_log2NZLpL1frac(L,L1,n-l-1,n+l+1,ip)
-							- der1_logNLpZfrac(L,n-l-1,n+l+1,ip)
-							- std::log(NL1mZ)*der_NLmZpowQ_div_NLpZpowP(z,
+					auto tuple = der1_log2NZLpL1_and_logNLpZ_frac(L,L1,
+							n-l-1,n+l+1,ip);
+					double der_log2NZLpL1_frac = std::get<0>(tuple);
+					double der_logNLpZ_frac = std::get<1>(tuple);
+					return prefactor * (der_log2NZLpL1_frac
+							- der_logNLpZ_frac
+							- std::log(NL1pZ)*der_NLmZpowQ_div_NLpZpowP(z,
 								n,L,n-l-1,n+l+1,ip)
 							);
 				};
+
 				if(i==0 && j!= 0)
 					return fourZZ_2lp2 * der1(lambda1,lambda,j);
 				if(j==0 && i!= 0)
 					return fourZZ_2lp2 * der1(lambda,lambda1,i);
-				return 0.;
+
+				auto term = [&](int s, int r){
+					double minus1_pow = (1+i-s)&1 ? -1 : 1;
+					return binomial(i,s) * minus1_pow
+						* factorial(i-s-1)
+						* der_NLmZpowQ_div_NLpZpowP(z,n,lambda,n-l-1,
+								n+l+1,s)
+						* binomial(j,r) * binpow(LpL1,-i-j+s+r)
+						* factorial_power(s-i,j-r)
+						* der_NLmZpowQ_div_NLpZpowP(z,n,lambda1,n-l-1,
+								n+l+1,r);
+				};
+				double sum = 0.;
+				if(i-1 >= 0){
+					for(int s = 0; s <= i-1; ++s){
+						for(int r = 0; r <= j; ++r){
+							sum += term(s,r);
+						}
+					}
+				}
+				auto tuple = der1_log2NZLpL1_and_logNLpZ_frac(lambda1,
+					  lambda, n-l-1, n+l+1, j); 
+				double der_log2NZLpL1_frac_j = std::get<0>(tuple);
+				double der_logNLpZ_frac_j = std::get<1>(tuple);
+				auto der_same = der_NLmZpowQ_div_NLpZpowP(z,n,lambda,
+						n-l-1,n+l+1,i);
+
+				sum += der_log2NZLpL1_frac_j * der_same;
+				sum -= der1_logNLpZfrac(lambda,n-l-1,n+l+1,i)
+					* der_NLmZpowQ_div_NLpZpowP(z,n,lambda1,n-l-1,n+l+1,j);
+				sum -= der_logNLpZ_frac_j * der_same;
+
+				return fourZZ_2lp2 * sum;
 			}
 
 			double der_generating_general_z(double z, unsigned int n,
@@ -227,10 +279,40 @@ namespace effz{
 					unsigned int i, unsigned int j)
 			{
 				double n_div_2z = static_cast<double>(n) / (2.*z);
-				double prefactor = -2. * binpow(n_div_2z, 2*l + 3)
+				double prefactor = -2. * binpow(n_div_2z, 2*l+3)
 					* factorial(n+l) / factorial(n-l-1);
+				std::cout << prefactor
+					* generating_general_term_a(z,n,l,lambda,lambda1,i,j)
+					<< "\n";
+				std::cout << prefactor
+					* generating_general_term_b(z,n,l,lambda,lambda1,i,j)
+					<< "\n";
+				std::cout << prefactor
+					* generating_general_term_c(z,n,l,lambda,lambda1,i,j)
+					<< "\n";
+				std::cout << prefactor
+					* generating_general_term_d(z,n,l,lambda,lambda1,i,j)
+					<< "\n";
+				std::cout << prefactor
+					* generating_general_term_e(z,n,l,lambda,lambda1,i,j)
+					<< "\n";
+				std::cout << prefactor
+					* generating_general_term_f(z,n,l,lambda,lambda1,i,j)
+					<< "\n";
+				std::cout << prefactor
+					* generating_general_term_g(z,n,l,lambda,lambda1,i,0)
+					<< "\n";
+				std::cout << prefactor
+					* generating_general_term_g(z,n,l,lambda,lambda1,i,j)
+					<< "\n";
 				return prefactor * (
 					generating_general_term_a(z,n,l,lambda,lambda1,i,j)
+					+ generating_general_term_b(z,n,l,lambda,lambda1,i,j)
+					+ generating_general_term_c(z,n,l,lambda,lambda1,i,j)
+					+ generating_general_term_d(z,n,l,lambda,lambda1,i,j)
+					+ generating_general_term_e(z,n,l,lambda,lambda1,i,j)
+					+ generating_general_term_f(z,n,l,lambda,lambda1,i,j)
+					+ generating_general_term_g(z,n,l,lambda,lambda1,i,j)
 						);
 			}
 		} /* end namespace single */
