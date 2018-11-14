@@ -19,6 +19,7 @@ limitations under the License.
 #include <effz_lib/effz_spec_func.h>
 
 #include <cmath>
+#include <tuple>
 #include <iostream>
 
 namespace effz{
@@ -29,7 +30,7 @@ namespace effz{
 					int p, unsigned int i)
 			{
 				return binpow(n,i)
-					* binpow((static_cast<double>(n) * lambda + z),p+i)
+					/ binpow((static_cast<double>(n) * lambda + z),p+i)
 					* factorial_power(-p,i);
 			}
 
@@ -260,7 +261,7 @@ namespace effz{
 					}
 				}
 				auto tuple = der1_log2NZLpL1_and_logNLpZ_frac(lambda1,
-					  lambda, n-l-1, n+l+1, j); 
+					  lambda, n-l-1, n+l+1, j);
 				double der_log2NZLpL1_frac_j = std::get<0>(tuple);
 				double der_logNLpZ_frac_j = std::get<1>(tuple);
 				auto der_same = der_NLmZpowQ_div_NLpZpowP(z,n,lambda,
@@ -274,6 +275,35 @@ namespace effz{
 				return fourZZ_2lp2 * sum;
 			}
 
+			double generating_general_term_h(double z, unsigned int n,
+					unsigned int l, double lambda, double lambda1,
+					unsigned int i, unsigned int j)
+			{
+				double fourZZ_2lp2 = binpow(4.*z*z,2*l+2);
+				auto der1 = [&](unsigned k){
+					auto term = [&](unsigned s){
+						return binomial(i,s)
+							* factorial_power(-1+k-2*l,i-s)
+							* der_NLpZpowMP(z,n,lambda,k+1,s)
+							* der_LpL1powQ_div_NLpZpowP(z,n,lambda1,
+									lambda,-1-i+k-2*l+s,k+1,j);
+					};
+					double sum = 0.;
+					for(unsigned s = 0; s <= i; ++s){
+						sum += term(s);
+					}
+					return sum;
+				};
+				double sum_k = 0.;
+				for(unsigned k = 0; k <= 2*l; ++k){
+					sum_k += factorial(2*l-k)
+						/ factorial(n+l-k)
+						* binpow(2.*static_cast<double>(n)*z,-2*l-1+k)
+						* der1(k);
+				}
+				return -fourZZ_2lp2 * factorial(n-l-1) * sum_k;
+			}
+
 			double der_generating_general_z(double z, unsigned int n,
 					unsigned int l, double lambda, double lambda1,
 					unsigned int i, unsigned int j)
@@ -281,30 +311,30 @@ namespace effz{
 				double n_div_2z = static_cast<double>(n) / (2.*z);
 				double prefactor = -2. * binpow(n_div_2z, 2*l+3)
 					* factorial(n+l) / factorial(n-l-1);
-				std::cout << prefactor
-					* generating_general_term_a(z,n,l,lambda,lambda1,i,j)
-					<< "\n";
-				std::cout << prefactor
-					* generating_general_term_b(z,n,l,lambda,lambda1,i,j)
-					<< "\n";
-				std::cout << prefactor
-					* generating_general_term_c(z,n,l,lambda,lambda1,i,j)
-					<< "\n";
-				std::cout << prefactor
-					* generating_general_term_d(z,n,l,lambda,lambda1,i,j)
-					<< "\n";
-				std::cout << prefactor
-					* generating_general_term_e(z,n,l,lambda,lambda1,i,j)
-					<< "\n";
-				std::cout << prefactor
-					* generating_general_term_f(z,n,l,lambda,lambda1,i,j)
-					<< "\n";
-				std::cout << prefactor
-					* generating_general_term_g(z,n,l,lambda,lambda1,i,0)
-					<< "\n";
-				std::cout << prefactor
-					* generating_general_term_g(z,n,l,lambda,lambda1,i,j)
-					<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_a(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_b(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_c(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_d(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_e(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_f(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_g(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
+				//std::cout << prefactor
+					//* generating_general_term_h(z,n,l,lambda,lambda1,i,j)
+					//<< "\n";
 				return prefactor * (
 					generating_general_term_a(z,n,l,lambda,lambda1,i,j)
 					+ generating_general_term_b(z,n,l,lambda,lambda1,i,j)
@@ -313,6 +343,7 @@ namespace effz{
 					+ generating_general_term_e(z,n,l,lambda,lambda1,i,j)
 					+ generating_general_term_f(z,n,l,lambda,lambda1,i,j)
 					+ generating_general_term_g(z,n,l,lambda,lambda1,i,j)
+					+ generating_general_term_h(z,n,l,lambda,lambda1,i,j)
 						);
 			}
 		} /* end namespace single */
