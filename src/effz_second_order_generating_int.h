@@ -22,13 +22,13 @@ limitations under the License.
 namespace effz{
 	namespace second_order{
 		namespace single{
-			double der_generating_general_z(double z, unsigned int n,
-					unsigned int l, double lambda, double lambda1,
-					unsigned int i, unsigned int j);
+			double der_generating_general_z(double z, int n,
+					int l, double lambda, double lambda1,
+					int i, int j);
 
-			inline double der_generating_general(unsigned int n,
-					unsigned int l, double lambda, double lambda1,
-					unsigned int i, unsigned int j)
+			inline double der_generating_general(int n,
+					int l, double lambda, double lambda1,
+					int i, int j)
 			{
 				return der_generating_general_z(1,n,l,lambda,
 						lambda1,i,j);
