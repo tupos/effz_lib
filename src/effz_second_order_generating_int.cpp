@@ -21,6 +21,7 @@ limitations under the License.
 #include <cmath>
 #include <tuple>
 #include <iostream>
+#include <iomanip>
 
 namespace effz{
 	namespace second_order{
@@ -55,11 +56,22 @@ namespace effz{
 					int n, double lambda,
 					int q, int p, int i)
 			{
+				if(q == 0) return der_NLpZpowMP(z,n,lambda,p,i);
+
 				auto term = [&](int s){
+					double factor;
+					if(q-(i-s) == 0){
+						factor = 1.;
+					} else if(q-(i-s) < 0){
+						factor = 0.;
+					} else{
+						factor = binpow(static_cast<double>(n)*lambda-z,
+								q-(i-s));
+					}
 					return binomial(i,s)
 						* factorial_power(q,i-s)
 						* factorial_power(-p,s)
-						* binpow(static_cast<double>(n)*lambda-z,q-(i-s))
+						* factor
 						/ binpow(static_cast<double>(n)*lambda+z,p+s);
 				};
 				double res = 0.;
@@ -126,6 +138,8 @@ namespace effz{
 					int l, double lambda, double lambda1,
 					int i, int j)
 			{
+				if(n-l-1 == 0) return 0.;
+
 				return static_cast<double>(n-l-1)
 					/ static_cast<double>(2*n)
 					* binpow(4.*z*z,2*l+2)
@@ -137,6 +151,8 @@ namespace effz{
 					int l, double lambda, double lambda1,
 					int i, int j)
 			{
+				if(n-l-1 == 0) return 0.;
+
 				return -static_cast<double>(n-l-1)
 					/ static_cast<double>(2*n)
 					* binpow(4.*z*z,2*l+3)
@@ -311,28 +327,28 @@ namespace effz{
 				double n_div_2z = static_cast<double>(n) / (2.*z);
 				double prefactor = -2. * binpow(n_div_2z, 2*l+3)
 					* factorial(n+l) / factorial(n-l-1);
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_a(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_b(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_c(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_d(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_e(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_f(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_g(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
-				//std::cout << prefactor
+				//std::cout << std::setprecision(15) << prefactor
 					//* generating_general_term_h(z,n,l,lambda,lambda1,i,j)
 					//<< "\n";
 				return prefactor * (
